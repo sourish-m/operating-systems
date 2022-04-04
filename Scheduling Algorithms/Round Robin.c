@@ -151,21 +151,21 @@ int main() {
 	for(i=0;i<d;i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
-		printf(" | OS -> Process");
+			printf(" | OS -> Process");
 		else if(i==d-1 || cswt_idle[i]=='i')
-		printf(" | Process -> OS\n");
+			printf(" | Process -> OS\n");
 		else
-		printf(" | Process -> OS -> Process");
+			printf(" | Process -> OS -> Process");
 	}
 	printf("\n Mode switch points:");
 	for(i=0;i<d;i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
-		printf(" | Kernel -> User");
+			printf(" | Kernel -> User");
 		else if(i==d-1 || cswt_idle[i]=='i')
-		printf(" | User -> Kernel");
+			printf(" | User -> Kernel");
 		else
-		printf(" | User -> Kernel -> User");
+			printf(" | User -> Kernel -> User");
 	}
 	
 	getch();
