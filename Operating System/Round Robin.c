@@ -1,34 +1,33 @@
 #include <stdio.h>
 #include <conio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 void line(int);
 
 struct PCB
 {
-	int p, at, bt, pr, wt, ta, rt;
+	int p, at, bt, wt, ta, rt;
+	bool visited;
 }a[10], t;
 
-void main()
-{ 
-	int i, j, c=0, idle=0, n, con_swt[20], d=0, quant, comp=0, flag=0;
+int main() { 
+	int i, j, c=0, idle=0, n, con_swt[20], d=0;
 	float WTsum=0, TAsum=0, WTavg, TAavg, util_time=0, util_perc;
 	char cswt_idle[40];
+	int quant, comp=0, q[10], front=0, rear=-1;
 //	clrscr();
 	
-	do
-	{
+	do {
 		printf("\n Enter number of processes: ");
 		scanf("%d", &n);
 		
-		if(n<1)
-		{
+		if(n<1) {
 			system("cls");
 			printf("\n Number of processes must be > 0");
 		}
 	}while(n<1);
 	
-	printf("\n Enter Arrival time, Burst time and Priority for processes:\n");
-	
+	printf("\n Enter Arrival time(AT) and Burst time(BT) for processes:\n");
 	for(i=0;i<n;i++)
 	{
 		a[i].p=i;
@@ -38,10 +37,9 @@ void main()
 		scanf("%d", &a[i].at);
 		printf(" BT[%d] = ", i);
 		scanf("%d", &a[i].bt);
-		printf(" PR[%d] = ", i);
-		scanf("%d", &a[i].pr);
 		util_time+=a[i].bt;
 		a[i].rt=a[i].bt;
+		a[i].visited=false;
 		printf("\n");
 	}
 	printf(" Enter time quantum: ");
@@ -49,14 +47,13 @@ void main()
 	
 	system("cls");
 	printf("\n --------- Round Robin Scheduling ---------\n");
-	printf("\n Input: (Lower the num, higher the priority)");
-	line(48);
-	printf(" Process   Arrival time   Burst Time   Priority");
-	line(48);
+	printf("\n Input:");
+	line(37);
+	printf(" Process   Arrival time   Burst Time");
+	line(37);
 	for(i=0;i<n;i++)
-	{
-		printf(" P%d            %d ms          %d ms        %d\n", i, a[i].at, a[i].bt, a[i].pr);
-	}
+		printf(" P%d            %d ms          %d ms\n", i, a[i].at, a[i].bt);
+		
 	printf("\n Time quantum: %d\n", quant);
 	
 //	sorting acc. to increasing arrival time
@@ -74,13 +71,17 @@ void main()
 	}
 	
 //	calculations
-	for(i=0;comp!=n;)
-	{
+	q[++rear]=0;
+	a[0].visited=true;
+	while(comp!=n) {
+		i=q[front];
+		front++;
+		
 		if(a[i].at>c)
 		{
-			idle+=a[i].at-c;
 			if(c)
 			{
+				idle+=a[i].at-c;
 				cswt_idle[d]='i';
 				con_swt[d++]=c;
 			}
@@ -88,40 +89,48 @@ void main()
 			cswt_idle[d]='o';
 		}
 		
-		if(a[i].rt<=quant && a[i].rt>0) 
-		{
-			con_swt[d++]=c;
-		    c+=a[i].rt;
-		    a[i].rt=0;
-		    flag=1;
-		}
-	    else if(a[i].rt>0)  
-	    {
+		if(a[i].rt>quant) {
 	    	con_swt[d++]=c;
 	        a[i].rt-=quant;
 	        c+=quant;
 	    }
-	    
-	    if(a[i].rt==0 && flag==1)  
-	    {
-	        comp++;
+		else {
+			con_swt[d++]=c;
+		    c+=a[i].rt;
+		    a[i].rt=0;
+		    comp++;
 	        a[i].ta=c-a[i].at;
 			a[i].wt=a[i].ta-a[i].bt;
 			WTsum+=a[i].wt;
 			TAsum+=a[i].ta;
-	        flag=0;
-	    }
-	    if(i==n-1)
-	    	i=0;
-	    else if(a[i+1].at<=c || a[i].rt==0)
-	    	i++;
-	    else if(a[i].rt)
-			i=0;
+		}
+	    
+	    for(j=1; j<n; j++) {
+	    	if(a[j].rt>0 && a[j].at<=c && !a[j].visited) {
+	    		q[++rear]=j;
+	    		a[j].visited=true;
+			}
+		}
+		
+		if(a[i].rt>0) {
+			q[++rear]=i;
+		}
+		
+		if(front>rear) {
+			for(i=1; i<n; i++) {
+				if(a[i].rt>0) {
+					q[++rear]=i;
+					a[i].visited=true;
+					break;
+				}
+			}
+		}
 	}
 	con_swt[d++]=c;
 	WTavg=WTsum/n;
 	TAavg=TAsum/n;
 	util_perc=util_time/c*100;
+	
 	
 	for(i=0;i<n;i++)
 	{
@@ -135,15 +144,12 @@ void main()
 			}
 		}
 	}
-	
 	printf("\n Output:");
 	line(42);
 	printf(" Process   Waiting time   Turnaround Time");
 	line(42);
 	for(i=0;i<n;i++)
-	{
 		printf(" P%d            %d ms            %d ms\n", a[i].p, a[i].wt, a[i].ta);
-	}
 	
 	printf("\n\n Average Waiting Time: %.3f ms\n", WTavg);
 	printf("\n Average Turnaround Time: %.3f ms\n", TAavg);
@@ -181,7 +187,7 @@ void main()
 		printf(" | User -> Kernel -> User");
 	}
 	
-	getch();
+	getch();	
 }
 
 void line(int x)
