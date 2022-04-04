@@ -10,7 +10,7 @@ struct PCB
 	bool visited;
 }a[10], t;
 
-int main()  { 
+int main() { 
 	int i, j, c=0, idle=0, n, con_swt[20], d=0;
 	float WTsum=0, TAsum=0, WTavg, TAavg, util_time=0, util_perc;
 	char cswt_idle[40];
