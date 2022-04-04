@@ -16,6 +16,6 @@ Determined:
 + Points of context switches (indicating the switches)
 + Points of mode switches (indicating the switches)
 #
-```
-Thank you!
+```c
+#include "Thank you!"
 ```
