@@ -168,14 +168,13 @@ int main() {
 		printf(" | User -> Kernel -> User");
 	}
 	
-	getch();	
+	getch();
 }
 
 void line(int x) {
 	int i;
 	printf("\n");
-	for(i=0;i<x;i++) {
+	for(i=0;i<x;i++)
 		printf("-");
-	}
 	printf("\n");
 }
