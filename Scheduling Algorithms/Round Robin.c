@@ -28,8 +28,7 @@ int main() {
 	}while(n<1);
 	
 	printf("\n Enter Arrival time(AT) and Burst time(BT) for processes:\n");
-	for(i=0;i<n;i++)
-	{
+	for(i=0;i<n;i++) {
 		a[i].p=i;
 		printf("\n Process %d", i);
 		line(11);
@@ -57,12 +56,9 @@ int main() {
 	printf("\n Time quantum: %d\n", quant);
 	
 //	sorting acc. to increasing arrival time
-	for(i=0;i<n;i++)
-	{
-		for(j=i+1;j<n;j++)
-		{
-			if(a[j].at<a[i].at)
-			{
+	for(i=0;i<n;i++) {
+		for(j=i+1;j<n;j++) {
+			if(a[j].at<a[i].at) {
 				t=a[i];
 				a[i]=a[j];
 				a[j]=t;
@@ -77,10 +73,8 @@ int main() {
 		i=q[front];
 		front++;
 		
-		if(a[i].at>c)
-		{
-			if(c)
-			{
+		if(a[i].at>c) {
+			if(c) {
 				idle+=a[i].at-c;
 				cswt_idle[d]='i';
 				con_swt[d++]=c;
@@ -132,12 +126,9 @@ int main() {
 	util_perc=util_time/c*100;
 	
 	
-	for(i=0;i<n;i++)
-	{
-		for(j=i+1;j<n;j++)
-		{
-			if(a[j].p<a[i].p)
-			{
+	for(i=0;i<n;i++) {
+		for(j=i+1;j<n;j++) {
+			if(a[j].p<a[i].p) {
 				t=a[i];
 				a[i]=a[j];
 				a[j]=t;
@@ -157,8 +148,7 @@ int main() {
 	printf("\n CPU Utilization Percentage: %.3f %%\n", util_perc);
 	printf("\n CPU Idle Time: %.3f ms\n", (float)idle);
 	printf("\n Context switch points:");
-	for(i=0;i<d;i++)
-	{
+	for(i=0;i<d;i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
 		printf(" | OS -> Process");
@@ -168,8 +158,7 @@ int main() {
 		printf(" | Process -> OS -> Process");
 	}
 	printf("\n Mode switch points:");
-	for(i=0;i<d;i++)
-	{
+	for(i=0;i<d;i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
 		printf(" | Kernel -> User");
@@ -182,14 +171,11 @@ int main() {
 	getch();	
 }
 
-void line(int x)
-{
+void line(int x) {
 	int i;
 	printf("\n");
-	for(i=0;i<x;i++)
-	{
+	for(i=0;i<x;i++) {
 		printf("-");
 	}
 	printf("\n");
 }
-
