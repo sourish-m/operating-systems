@@ -1,3 +1,4 @@
+// *****LOWER THE NUMBER, HIGHER THE PRIORITY*****
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
