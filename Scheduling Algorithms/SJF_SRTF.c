@@ -9,7 +9,7 @@ void line(int);
 
 struct PCB
 {
-	int p, at, bt, pr, wt, ta, rt;
+	int p, at, bt, wt, ta, rt;
 }a[10], t;
 void sort(int);
 
@@ -122,8 +122,6 @@ void input()
 		scanf("%d", &a[i].at);
 		printf(" BT[%d] = ", i);
 		scanf("%d", &a[i].bt);
-		printf(" PR[%d] = ", i);
-		scanf("%d", &a[i].pr);
 		util_time+=a[i].bt;
 		a[i].rt=a[i].bt;
 		printf("\n");
@@ -135,11 +133,11 @@ void input()
 	else
 	printf("\n --------- SRTF Scheduling ---------\n");
 	printf("\n Input: (Lower the num, higher the priority)");
-	line(48);
-	printf(" Process   Arrival time   Burst time   Priority");
-	line(48);
+	line(37);
+	printf(" Process   Arrival time   Burst time");
+	line(37);
 	for(i=0;i<n;i++)
-	printf(" P%d            %d ms          %d ms        %d\n", i, a[i].at, a[i].bt, a[i].pr);
+	printf(" P%d            %d ms          %d ms\n", i, a[i].at, a[i].bt);
 	
 //	sorting acc. to increasing arrival time
 	for(i=0;i<n;i++)
