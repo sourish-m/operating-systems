@@ -38,7 +38,7 @@ int main() {
 	}while(n<1);
 
 	printf("\n Enter Arrival time(AT), Burst time(BT) and Queue No.(QN) according to the corresponding queue types:");
-	printf("\n 1 - System Process\n 2 - Interactive Process\n 3 - Batch Process\n");
+	printf("\n 1 - System(OS) Process [RR]\n 2 - Interactive Process [SJF]\n 3 - Batch Process [FCFS]\n");
 	for(i=0;i<n;i++) {
 		a[i].p=i;
 		printf("\n Process %d", i);
@@ -95,7 +95,8 @@ int main() {
 		else if(f3<=r3)
 			fcfs();
 	}
-	con_swt[d++]=c;
+	if(con_swt[d-1]!=c)
+		con_swt[d++]=c;
 	WTavg=WTsum/n;
 	TAavg=TAsum/n;
 	util_perc=util_time/c*100;
@@ -132,7 +133,7 @@ int main() {
 		else
 			printf(" | Process -> OS -> Process");
 	}
-	printf("\n Mode switch points:");
+	printf("\n\n Mode switch points:");
 	for(i=0; i<d; i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
@@ -155,19 +156,26 @@ void rrobin() {
 	if(a[i].at>c) {
 		if(c) {
 			idle+=a[i].at-c;
-			cswt_idle[d]='i';
-			con_swt[d++]=c;
+			if(con_swt[d-1]!=c) {
+				cswt_idle[d]='i';
+				con_swt[d++]=c;
+			}
+			else
+				cswt_idle[d-1]='i';
 		}
 		c=a[i].at;
 		cswt_idle[d]='o';
+		con_swt[d++]=c;
 	}
 
 	if(a[i].rt>quant) {
-		con_swt[d++]=c;
+		if(con_swt[d-1]!=c)
+			con_swt[d++]=c;
 		a[i].rt-=quant;
 		c+=quant;
 	} else {
-		con_swt[d++]=c;
+		if(con_swt[d-1]!=c)
+			con_swt[d++]=c;
 		c+=a[i].rt;
 		a[i].rt=0;
 		comp++;
@@ -191,58 +199,70 @@ void rrobin() {
 	
 	if(f1<=r1)
 		rrobin();
-	else
+	else {
+		con_swt[d++]=c;
 		return;
+	}
 }
 
 void sjf() {
 	int i;
 	sort();
 	i = q2[f2];
-	f2++;
 	
 	if(c<a[i].at) {
-		idle+=a[i].at-c;
 		if(c) {
-			cswt_idle[d]='i';
-			con_swt[d++]=c;
+			idle+=a[i].at-c;
+			if(con_swt[d-1]!=c) {
+				cswt_idle[d]='i';
+				con_swt[d++]=c;
+			}
+			else
+				cswt_idle[d-1]='i';
 		}
 		c=a[i].at;
 		cswt_idle[d]='o';
+		con_swt[d++]=c;
 	}
-	con_swt[d++]=c;
 	
 	if(c1!=0) {
-		c++;
-		a[i].rt--;
+		while(!change(i, 2) && a[i].rt>0) {
+			c++;
+			a[i].rt--;
+		}
 		
 		if(a[i].rt==0) {
 			comp++;
+			f2++;
 			c2--;
 			a[i].ta=c-a[i].at;
 			a[i].wt=a[i].ta-a[i].bt;
 			WTsum+=a[i].wt;
 			TAsum+=a[i].ta;
 		}
-		else
-			q2[++r2]=i;
-		
-		if(change(i, 2)==1)
+		else if(change(i, 2))
 			return;
 	}
 	else {
-		a[i].wt=c-a[i].at;
-		a[i].ta=a[i].wt+a[i].bt;
-		WTsum+=a[i].wt;
-		TAsum+=a[i].ta;
+		if(con_swt[d-1]!=c)
+			con_swt[d++]=c;
 		c+=a[i].rt;
 		a[i].rt=0;
 		comp++;
+		f2++;
 		c2--;
+		a[i].ta=c-a[i].at;
+		a[i].wt=a[i].ta-a[i].bt;
+		WTsum+=a[i].wt;
+		TAsum+=a[i].ta;
 	}
 	
 	if(f2<=r2)
 		sjf();
+	else {
+		con_swt[d++]=c;
+		return;
+	}
 }
 
 void fcfs() {
@@ -250,19 +270,26 @@ void fcfs() {
 	i = q3[f3];
 	
 	if(c<a[i].at) {
-		idle+=a[i].at-c;
 		if(c) {
-			cswt_idle[d]='i';
-			con_swt[d++]=c;
+			idle+=a[i].at-c;
+			if(con_swt[d-1]!=c) {
+				cswt_idle[d]='i';
+				con_swt[d++]=c;
+			}
+			else
+				cswt_idle[d-1]='i';
 		}
 		c=a[i].at;
 		cswt_idle[d]='o';
+		con_swt[d++]=c;
 	}
-	con_swt[d++]=c;
+	
 	
 	if(c1!=0 || c2!=0) {
-		c++;
-		a[i].rt--;
+		while(!change(i, 3) && a[i].rt>0) {
+			c++;
+			a[i].rt--;
+		}
 		
 		if(a[i].rt==0) {
 			comp++;
@@ -272,23 +299,28 @@ void fcfs() {
 			WTsum+=a[i].wt;
 			TAsum+=a[i].ta;
 		}
-		
-		if(change(i, 3)!=3)
+		else if(change(i, 3))
 			return;
 	}
 	else {
-		a[i].wt=c-a[i].at;
-		a[i].ta=a[i].wt+a[i].bt;
-		WTsum+=a[i].wt;
-		TAsum+=a[i].ta;
+		if(con_swt[d-1]!=c)
+			con_swt[d++]=c;
 		c+=a[i].rt;
 		a[i].rt=0;
 		comp++;
 		f3++;
+		a[i].ta=c-a[i].at;
+		a[i].wt=a[i].ta-a[i].bt;
+		WTsum+=a[i].wt;
+		TAsum+=a[i].ta;
 	}
 	
 	if(f3<=r3)
 		fcfs();
+	else {
+		con_swt[d++]=c;
+		return;
+	}
 }
 
 void sort()
@@ -310,16 +342,15 @@ int change(int x, int qu) {
 	int i;
 	for(i=x+1; i<n; i++) {
 		if(a[i].at>c)
-			return qu;
+			return 0;
 		else if(a[i].qn<a[x].qn)
-			return a[i].qn;
+			return 1;
 	}
-	return qu;
+	return 0;
 }
 
 void check() {
 	int i;
-	bool flag=false;
 	for(i=0; i<n; i++) {
 		if(a[i].at<=c && !a[i].visited) {
 			switch(a[i].qn) {
@@ -333,19 +364,23 @@ void check() {
 					q3[++r3]=i;
 					break;
 			}
-			flag=true;
 			a[i].visited=true;
 		}
-//		else if(a[i].at>c && !flag) {
-//			if(c) {
-//				idle+=a[i].at-c;
-//				cswt_idle[d]='i';
-//				con_swt[d++]=c;
-//			}
-//			c=a[i].at;
-//			cswt_idle[d]='o';
-//			break;
-//		}
+		else if(f1>r1 && f2>r2 && f3>r3 && !a[i].visited) {
+			if(c) {
+				idle+=a[i].at-c;
+				if(con_swt[d-1]!=c) {
+					cswt_idle[d]='i';
+					con_swt[d++]=c;
+				}
+				else
+					cswt_idle[d-1]='i';
+			}
+			c=a[i].at;
+			cswt_idle[d]='o';
+			con_swt[d++]=c;
+			break;
+		}
 	}
 }  
 
