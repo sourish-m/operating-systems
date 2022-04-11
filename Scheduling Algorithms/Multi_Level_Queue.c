@@ -313,8 +313,8 @@ void check() {
 }
 
 void idle_time(int x) {
+	idle+=a[x].at-c;
 	if(c) {
-		idle+=a[x].at-c;
 		if(con_swt[d-1]!=c) {
 			cswt_idle[d]='i';
 			con_swt[d++]=c;
