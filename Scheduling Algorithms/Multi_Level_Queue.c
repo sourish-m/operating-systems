@@ -2,16 +2,18 @@
 #include <conio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-void check();
-void line(int);
-int change(int, int);
 void sort();
+void sps();
 void rrobin();
-void sjf();
 void fcfs();
+void check();
+void idle_time(int);
+void wt_ta_calc(int);
+int change(int, int);
+void line(int);
 
 struct PCB {
-	int p, at, bt, wt, ta, rt, qn;
+	int p, at, bt, wt, ta, rt, qn, pr;
 	bool visited;
 }a[10], t;
 int c=0, idle=0, n, con_swt[20], d=0;
@@ -24,7 +26,7 @@ int q3[10], f3=0, r3=-1;
 int c1=0, c2=0;
 
 int main() {
-//	clrscr();
+	// clrscr();
 	int i, j;
 	
 	do {
@@ -36,9 +38,10 @@ int main() {
 			printf("\n Number of processes must be > 0");
 		}
 	}while(n<1);
-
-	printf("\n Enter Arrival time(AT), Burst time(BT) and Queue No.(QN) according to the corresponding queue types:");
-	printf("\n 1 - System(OS) Process [RR]\n 2 - Interactive Process [SJF]\n 3 - Batch Process [FCFS]\n");
+	
+	// input
+	printf("\n Enter Arrival time(AT), Burst time(BT), Priority(PR) and Queue No.(QN) according to the corresponding queue types:");
+	printf("\n 1 - System(OS) Process [RR]\n 2 - Interactive Process [sps]\n 3 - Batch Process [FCFS]\n");
 	for(i=0;i<n;i++) {
 		a[i].p=i;
 		printf("\n Process %d", i);
@@ -47,6 +50,8 @@ int main() {
 		scanf("%d", &a[i].at);
 		printf(" BT[%d] = ", i);
 		scanf("%d", &a[i].bt);
+		printf(" PR[%d] = ", i);
+		scanf("%d", &a[i].pr);
 		do {
 			printf(" QN[%d] = ", i);
 			scanf("%d", &a[i].qn);
@@ -65,33 +70,32 @@ int main() {
 	
 	system("cls");
 	printf("\n --------- Multi-Level Queue Scheduling ---------\n");
-	printf("\n Input: (Lower the Queue no., higher the priority)");
-	line(49);
-	printf(" Process   Arrival time   Burst time   Queue no.");
-	line(49);
+	printf("\n Input: (Lower the Priority/Queue no., higher the respective priority)");
+	line(60);
+	printf(" Process   Arrival time   Burst time   Priority   Queue no.");
+	line(60);
 	for(i=0;i<n;i++)
-		printf(" P%d            %d ms          %d ms          %d\n", i, a[i].at, a[i].bt, a[i].qn);
+		printf(" P%d            %d ms          %d ms          %d          %d\n", i, a[i].at, a[i].bt, a[i].pr, a[i].qn);
 		
 	printf("\n Time quantum for system process(es): %d\n", quant);
-
-//	sorting acc. to increasing arrival time
+	
+	// calculations
 	for(i=0; i<n; i++) {
 		for(j=i+1; j<n; j++) {
-			if(a[j].at<a[i].at || (a[j].at==a[i].at && a[j].qn<a[i].qn)) {
+			if(a[j].at<a[i].at) {
 				t=a[i];
 				a[i]=a[j];
 				a[j]=t;
 			}
 		}
 	}
-
-//	calculations
+	con_swt[d++]=c;
 	while(comp!=n) {
 		check();
 		if(f1<=r1)
-			rrobin();
+			sps();
 		else if(f2<=r2)
-			sjf();
+			rrobin();
 		else if(f3<=r3)
 			fcfs();
 	}
@@ -101,7 +105,7 @@ int main() {
 	TAavg=TAsum/n;
 	util_perc=util_time/c*100;
 
-
+	// output
 	for(i=0; i<n; i++) {
 		for(j=i+1; j<n; j++) {
 			if(a[j].p<a[i].p) {
@@ -143,122 +147,100 @@ int main() {
 		else
 			printf(" | User -> Kernel -> User");
 	}
-
 	getch();
 }
 
-void rrobin() {
-	int i, j;
-	
-	i=q1[f1];
-	f1++;
-	
-	if(a[i].at>c) {
-		if(c) {
-			idle+=a[i].at-c;
-			if(con_swt[d-1]!=c) {
-				cswt_idle[d]='i';
-				con_swt[d++]=c;
+void sort() {
+	int i, j, t;
+	for(i=f1; i<r1; i++) {
+		for(j=i+1; j<=r1; j++) {
+			if(a[q1[j]].pr<a[q1[i]].pr || a[q1[j]].pr==a[q1[i]].pr && a[q1[j]].rt<a[q1[i]].rt) {
+				t = q1[i];
+				q1[i] = q1[j];
+				q1[j] = t;
 			}
-			else
-				cswt_idle[d-1]='i';
 		}
-		c=a[i].at;
-		cswt_idle[d]='o';
+	}
+}
+
+void sps() {
+	int i, j;
+	i = q1[f1];
+	
+	if(c<a[i].at)
+		idle_time(i);
+	
+	if(con_swt[d-1]!=c)
 		con_swt[d++]=c;
-	}
-
-	if(a[i].rt>quant) {
-		if(con_swt[d-1]!=c)
-			con_swt[d++]=c;
-		a[i].rt-=quant;
-		c+=quant;
-	} else {
-		if(con_swt[d-1]!=c)
-			con_swt[d++]=c;
-		c+=a[i].rt;
-		a[i].rt=0;
-		comp++;
-		c1--;
-		a[i].ta=c-a[i].at;
-		a[i].wt=a[i].ta-a[i].bt;
-		WTsum+=a[i].wt;
-		TAsum+=a[i].ta;
-	}
-
-	for(j=1; j<n; j++) {
-		if(a[j].rt>0 && a[j].at<=c && !a[j].visited) {
-			q1[++r1]=j;
-			a[j].visited=true;
-		}
-	}
-
-	if(a[i].rt>0) {
-		q1[++r1]=i;
-	}
+	
+	sort();
+	comp++;
+	f1++;
+	c1--;
+	c+=a[i].rt;
+	a[i].rt=0;
+	wt_ta_calc(i);
+	check();
 	
 	if(f1<=r1)
-		rrobin();
+		sps();
 	else {
 		con_swt[d++]=c;
 		return;
 	}
 }
 
-void sjf() {
-	int i;
-	sort();
-	i = q2[f2];
+void rrobin() {
+	int i, j, count, idk=f2;
+	i=q2[f2];
 	
-	if(c<a[i].at) {
-		if(c) {
-			idle+=a[i].at-c;
-			if(con_swt[d-1]!=c) {
-				cswt_idle[d]='i';
-				con_swt[d++]=c;
-			}
-			else
-				cswt_idle[d-1]='i';
-		}
-		c=a[i].at;
-		cswt_idle[d]='o';
-		con_swt[d++]=c;
-	}
+	if(a[i].at>c)
+		idle_time(i);
 	
 	if(c1!=0) {
-		while(!change(i, 2) && a[i].rt>0) {
+		if(con_swt[d-1]!=c)
+			con_swt[d++]=c;
+		count=quant;
+		while(!change(i, 2) && a[i].rt>0 && count>0) {
 			c++;
 			a[i].rt--;
+			count--;
 		}
 		
 		if(a[i].rt==0) {
 			comp++;
 			f2++;
 			c2--;
-			a[i].ta=c-a[i].at;
-			a[i].wt=a[i].ta-a[i].bt;
-			WTsum+=a[i].wt;
-			TAsum+=a[i].ta;
+			wt_ta_calc(i);
 		}
-		else if(change(i, 2))
-			return;
 	}
 	else {
-		if(con_swt[d-1]!=c)
-			con_swt[d++]=c;
-		c+=a[i].rt;
-		a[i].rt=0;
-		comp++;
-		f2++;
-		c2--;
-		a[i].ta=c-a[i].at;
-		a[i].wt=a[i].ta-a[i].bt;
-		WTsum+=a[i].wt;
-		TAsum+=a[i].ta;
+		if(a[i].rt>quant) {
+			if(con_swt[d-1]!=c)
+				con_swt[d++]=c;
+			a[i].rt-=quant;
+			c+=quant;
+		}
+		else {
+			if(con_swt[d-1]!=c)
+				con_swt[d++]=c;
+			comp++;
+			f2++;
+			c2--;
+			c+=a[i].rt;
+			a[i].rt=0;
+			wt_ta_calc(i);
+		}
 	}
+	check();
+	if(idk==f2)
+		f2++;
 	
-	if(f2<=r2)
-		sjf();
+	if(a[i].rt>0)
+		q2[++r2]=i;
+	
+	if(f2<=r2 && !change(i, 2))
+		rrobin();
 	else {
 		con_swt[d++]=c;
 		return;
@@ -269,23 +251,12 @@ void fcfs() {
 	int i;
 	i = q3[f3];
 	
-	if(c<a[i].at) {
-		if(c) {
-			idle+=a[i].at-c;
-			if(con_swt[d-1]!=c) {
-				cswt_idle[d]='i';
-				con_swt[d++]=c;
-			}
-			else
-				cswt_idle[d-1]='i';
-		}
-		c=a[i].at;
-		cswt_idle[d]='o';
-		con_swt[d++]=c;
-	}
-	
+	if(c<a[i].at)
+		idle_time(i);
 	
 	if(c1!=0 || c2!=0) {
+		if(con_swt[d-1]!=c)
+			con_swt[d++]=c;
 		while(!change(i, 3) && a[i].rt>0) {
 			c++;
 			a[i].rt--;
@@ -294,13 +265,8 @@ void fcfs() {
 		if(a[i].rt==0) {
 			comp++;
 			f3++;
-			a[i].ta=c-a[i].at;
-			a[i].wt=a[i].ta-a[i].bt;
-			WTsum+=a[i].wt;
-			TAsum+=a[i].ta;
+			wt_ta_calc(i);
 		}
-		else if(change(i, 3))
-			return;
 	}
 	else {
 		if(con_swt[d-1]!=c)
@@ -309,44 +275,15 @@ void fcfs() {
 		a[i].rt=0;
 		comp++;
 		f3++;
-		a[i].ta=c-a[i].at;
-		a[i].wt=a[i].ta-a[i].bt;
-		WTsum+=a[i].wt;
-		TAsum+=a[i].ta;
+		wt_ta_calc(i);
 	}
 	
-	if(f3<=r3)
+	if(f3<=r3 && !change(i, 3))
 		fcfs();
 	else {
 		con_swt[d++]=c;
 		return;
 	}
-}
-
-void sort()
-{
-	int i, j, t;
-	
-	for(i=f2; i<r2; i++) {
-		for(j=i+1; j<=r2; j++) {
-			if(a[q2[j]].rt<a[q2[i]].rt) {
-				t = q2[i];
-				q2[i] = q2[j];
-				q2[j] = t;
-			}
-		}
-	}
-}
-
-int change(int x, int qu) {
-	int i;
-	for(i=x+1; i<n; i++) {
-		if(a[i].at>c)
-			return 0;
-		else if(a[i].qn<a[x].qn)
-			return 1;
-	}
-	return 0;
 }
 
 void check() {
@@ -367,25 +304,48 @@ void check() {
 			a[i].visited=true;
 		}
 		else if(f1>r1 && f2>r2 && f3>r3 && !a[i].visited) {
-			if(c) {
-				idle+=a[i].at-c;
-				if(con_swt[d-1]!=c) {
-					cswt_idle[d]='i';
-					con_swt[d++]=c;
-				}
-				else
-					cswt_idle[d-1]='i';
-			}
-			c=a[i].at;
-			cswt_idle[d]='o';
-			con_swt[d++]=c;
+			idle_time(i);
 			break;
 		}
+		else if(a[i].at>c)
+			break;
 	}
-}  
+}
 
-void line(int x)
-{
+void idle_time(int x) {
+	if(c) {
+		idle+=a[x].at-c;
+		if(con_swt[d-1]!=c) {
+			cswt_idle[d]='i';
+			con_swt[d++]=c;
+		}
+		else
+			cswt_idle[d-1]='i';
+	}
+	c=a[x].at;
+	cswt_idle[d]='o';
+	con_swt[d++]=c;
+}
+
+void wt_ta_calc(int x) {
+	a[x].ta=c-a[x].at;
+	a[x].wt=a[x].ta-a[x].bt;
+	WTsum+=a[x].wt;
+	TAsum+=a[x].ta;
+}
+
+int change(int x, int qu) {
+	int i;
+	for(i=x+1; i<n; i++) {
+		if(a[i].at>c)
+			return 0;
+		else if(a[i].qn<a[x].qn)
+			return 1;
+	}
+	return 0;
+}
+
+void line(int x) {
 	int i;
 	printf("\n");
 	for(i=0; i<x; i++)
