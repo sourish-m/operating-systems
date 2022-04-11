@@ -4,31 +4,28 @@
 void input();
 void sjf();
 void srtf();
+void sort(int);
+void idle_time(int);
 int time(int);
 void line(int);
 
 struct PCB
 {
-	int p, at, bt, wt, ta, rt;
+	int p, at, bt, pr, wt, ta, rt;
 }a[10], t;
-void sort(int);
-
 int c=0, idle=0, n, con_swt[20], d=0, opt;
 float WTsum, TAsum, WTavg, TAavg, util_time=0, util_perc;
 char cswt_idle[40];
 
-void main()
-{
+void main() {
 	int i, j;
 	//clrscr();
-	
 	flag:
 	printf("\n 1. SJF Scheduling\n 2. SRTF Scheduling\n 3. Exit\n");
 	printf("\n Enter choice: ");
 	scanf("%d", &opt);
 	
-	switch(opt)
-	{
+	switch(opt) {
 		case 1:
 			input();
 			sjf();
@@ -45,12 +42,9 @@ void main()
 			goto flag;
 	}
 	
-	for(i=0;i<n;i++)
-	{
-		for(j=i+1;j<n;j++)
-		{
-			if(a[j].p<a[i].p)
-			{
+	for(i=0;i<n;i++) {
+		for(j=i+1;j<n;j++) {
+			if(a[j].p<a[i].p) {
 				t=a[i];
 				a[i]=a[j];
 				a[j]=t;
@@ -63,7 +57,7 @@ void main()
 	printf(" Process   Waiting time   Turnaround time");
 	line(42);
 	for(i=0;i<n;i++)
-	printf(" P%d            %d ms            %d ms\n", a[i].p, a[i].wt, a[i].ta);
+		printf(" P%d            %d ms            %d ms\n", a[i].p, a[i].wt, a[i].ta);
 	
 	printf("\n\n Average waiting time: %.3f ms\n", WTavg);
 	printf("\n Average turnaround time: %.3f ms\n", TAavg);
@@ -71,50 +65,42 @@ void main()
 	printf("\n CPU utilization percentage: %.3f %%\n", util_perc);
 	printf("\n CPU idle time: %.3f ms\n", (float)idle);
 	printf("\n Context switch points:");
-	for(i=0;i<d;i++)
-	{
+	for(i=0;i<d;i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
-		printf(" | OS -> Process");
+			printf(" | OS -> Process");
 		else if(i==d-1 || cswt_idle[i]=='i')
-		printf(" | Process -> OS");
+			printf(" | Process -> OS\n");
 		else
-		printf(" | Process -> OS -> Process");
+			printf(" | Process -> OS -> Process");
 	}
-	printf("\n Mode switch points:");
-	for(i=0;i<d;i++)
-	{
+	printf("\n\n Mode switch points:");
+	for(i=0;i<d;i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
-		printf(" | Kernel -> User");
+			printf(" | Kernel -> User");
 		else if(i==d-1 || cswt_idle[i]=='i')
-		printf(" | User -> Kernel");
+			printf(" | User -> Kernel");
 		else
-		printf(" | User -> Kernel -> User");
+			printf(" | User -> Kernel -> User");
 	}
 	
 	getch();
 }
 
-void input()
-{
+void input() {
 	int i, j;
-	
-	do
-	{
+	do {
 		printf("\n Enter number of processes: ");
 		scanf("%d", &n);
-		
-		if(n<1)
-		{
+		if(n<1) {
 			system("cls");
 			printf("\n Number of processes must be > 0");
 		}
 	}while(n<1);
 	
 	printf("\n Enter Arrival time(AT), Burst time(BT) and Priority(PR) for processes:\n");
-	for(i=0;i<n;i++)
-	{
+	for(i=0;i<n;i++) {
 		a[i].p=i;
 		printf("\n Process %d", i);
 		line(11);
@@ -122,6 +108,8 @@ void input()
 		scanf("%d", &a[i].at);
 		printf(" BT[%d] = ", i);
 		scanf("%d", &a[i].bt);
+		printf(" PR[%d] = ", i);
+		scanf("%d", &a[i].pr);
 		util_time+=a[i].bt;
 		a[i].rt=a[i].bt;
 		printf("\n");
@@ -129,23 +117,20 @@ void input()
 	
 	system("cls");
 	if(opt==1)
-	printf("\n --------- SJF Scheduling ---------\n");
+		printf("\n --------- SJF Scheduling ---------\n");
 	else
-	printf("\n --------- SRTF Scheduling ---------\n");
+		printf("\n --------- SRTF Scheduling ---------\n");
 	printf("\n Input: (Lower the num, higher the priority)");
-	line(37);
-	printf(" Process   Arrival time   Burst time");
-	line(37);
+	line(48);
+	printf(" Process   Arrival time   Burst time   Priority");
+	line(48);
 	for(i=0;i<n;i++)
-	printf(" P%d            %d ms          %d ms\n", i, a[i].at, a[i].bt);
+		printf(" P%d            %d ms          %d ms        %d\n", i, a[i].at, a[i].bt, a[i].pr);
 	
-//	sorting acc. to increasing arrival time
-	for(i=0;i<n;i++)
-	{
-		for(j=i+1;j<n;j++)
-		{
-			if(a[j].at<a[i].at)
-			{
+	// sorting acc. to increasing arrival time
+	for(i=0;i<n;i++) {
+		for(j=i+1;j<n;j++) {
+			if(a[j].at<a[i].at) {
 				t=a[i];
 				a[i]=a[j];
 				a[j]=t;
@@ -154,57 +139,41 @@ void input()
 	}
 }
 
-//sorting acc. to increasing burst/remaining time
-void sort(int x)
-{
+// swapping with lower burst/remaining time
+void sort(int x) {
 	int i=x, j, min, flag=0;
 	min = time(x);
 	
-	for(j=x+1;j<n;j++)
-	{
+	for(j=x+1;j<n;j++) {
 		if(a[j].at>c)
-		break;
+			break;
 		
-		if(time(j)<min)
-		{
+		if(time(j)<min) {
 			min = time(j);
 			i = j;
 			flag=1;
 		}
-		else if(time(j)==min && (a[j].at<a[i].at || (a[j].at==a[i].at && a[j].p<a[i].p)))
-		{
+		else if(time(j)==min && a[j].pr<a[i].pr) {	// tie-breaker (priority)
 			i = j;
 			flag=1;
 		}
 	}
 	
-	if(flag)
-	{
+	if(flag) {
 		if(con_swt[d-1]!=c && opt==2)
-		con_swt[d++]=c;
+			con_swt[d++]=c;
 		t = a[x];
 		a[x] = a[i];
 		a[i] = t;
 	}
 }
 
-void sjf()
-{
+void sjf() {
 	int i;
 	
-	for(i=0;i<n;i++)
-	{
+	for(i=0;i<n;i++) {
 		if(c<a[i].at)
-		{
-			idle+=a[i].at-c;
-			if(c)
-			{
-				cswt_idle[d]='i';
-				con_swt[d++]=c;
-			}
-			c=a[i].at;
-			cswt_idle[d]='o';
-		}
+			idle_time(i);
 		
 		con_swt[d++]=c;
 		sort(i);
@@ -220,32 +189,19 @@ void sjf()
 	util_perc=util_time/c*100;
 }
 
-void srtf()
-{
+void srtf() {
 	int i;
 	
-	for(i=0;i<n;i++)
-	{
+	for(i=0;i<n;i++) {
 		if(c<a[i].at)
-		{
-			idle+=a[i].at-c;
-			if(c)
-			{
-				cswt_idle[d]='i';
-				con_swt[d++]=c;
-			}
-			c=a[i].at;
-			cswt_idle[d]='o';
-		}
+			idle_time(i);
 		
 		con_swt[d++]=c;
-		while(a[i].rt!=0)
-		{
+		while(a[i].rt!=0) {
 			sort(i);
 			c++;
 			a[i].rt--;
 		}
-		
 		a[i].ta=c-a[i].at;
 		a[i].wt=a[i].ta-a[i].bt;
 		WTsum+=a[i].wt;
@@ -257,19 +213,27 @@ void srtf()
 	util_perc=util_time/c*100;
 }
 
-int time(int x)
-{
-	if(opt==1)
-	return a[x].bt;
-	else
-	return a[x].rt;
+void idle_time(int x) {
+	idle+=a[x].at-c;
+	if(c) {
+		cswt_idle[d]='i';
+		con_swt[d++]=c;
+	}
+	c=a[x].at;
+	cswt_idle[d]='o';
 }
 
-void line(int x)
-{
+int time(int x) {
+	if(opt==1)
+		return a[x].bt;
+	else
+		return a[x].rt;
+}
+
+void line(int x) {
 	int i;
 	printf("\n");
 	for(i=0;i<x;i++)
-	printf("-");
+		printf("-");
 	printf("\n");
 }
