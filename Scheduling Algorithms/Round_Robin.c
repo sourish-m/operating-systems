@@ -7,15 +7,14 @@ void line(int);
 struct PCB {
 	int p, at, bt, wt, ta, rt;
 	bool visited;
-} a[10], t;
+}a[10], t;
 
 int main() {
 	int i, j, c=0, idle=0, n, con_swt[20], d=0;
 	float WTsum=0, TAsum=0, WTavg, TAavg, util_time=0, util_perc;
 	char cswt_idle[40];
 	int quant, comp=0, q[10], front=0, rear=-1;
-//	clrscr();
-
+	// clrscr();
 	do {
 		printf("\n Enter number of processes: ");
 		scanf("%d", &n);
@@ -71,10 +70,9 @@ int main() {
 	while(comp!=n) {
 		i=q[front];
 		front++;
-
 		if(a[i].at>c) {
+			idle+=a[i].at-c;
 			if(c) {
-				idle+=a[i].at-c;
 				cswt_idle[d]='i';
 				con_swt[d++]=c;
 			}
@@ -86,7 +84,8 @@ int main() {
 			con_swt[d++]=c;
 			a[i].rt-=quant;
 			c+=quant;
-		} else {
+		}
+		else {
 			con_swt[d++]=c;
 			c+=a[i].rt;
 			a[i].rt=0;
@@ -104,9 +103,8 @@ int main() {
 			}
 		}
 
-		if(a[i].rt>0) {
+		if(a[i].rt>0)
 			q[++rear]=i;
-		}
 
 		if(front>rear) {
 			for(i=1; i<n; i++) {
@@ -122,7 +120,6 @@ int main() {
 	WTavg=WTsum/n;
 	TAavg=TAsum/n;
 	util_perc=util_time/c*100;
-
 
 	for(i=0; i<n; i++) {
 		for(j=i+1; j<n; j++) {
@@ -155,7 +152,7 @@ int main() {
 		else
 			printf(" | Process -> OS -> Process");
 	}
-	printf("\n Mode switch points:");
+	printf("\n\n Mode switch points:");
 	for(i=0; i<d; i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
@@ -165,12 +162,10 @@ int main() {
 		else
 			printf(" | User -> Kernel -> User");
 	}
-
 	getch();
 }
 
-void line(int x)
-{
+void line(int x) {
 	int i;
 	printf("\n");
 	for(i=0; i<x; i++)

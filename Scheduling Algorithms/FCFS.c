@@ -8,12 +8,11 @@ struct PCB
 	int p, at, bt, wt, ta;
 }a[10], t;
 
-void main() { 
+void main() {
 	int c=0, idle=0, i, j, n, con_swt[20], d=0;
 	float WTsum, TAsum, WTavg, TAavg, util_time=0, util_perc;
 	char cswt_idle[40];
-//	clrscr();
-	
+	// clrscr();
 	do {
 		printf("\n Enter number of processes: ");
 		scanf("%d", &n);
@@ -37,14 +36,14 @@ void main() {
 	
 	system("cls");
 	printf("\n --------- FCFS Scheduling ---------\n");
-	printf("\n Input: (Lower the num, higher the priority)");
+	printf("\n Input:");
 	line(37);
 	printf(" Process   Arrival time   Burst Time");
 	line(37);
 	for(i=0;i<n;i++)
 		printf(" P%d            %d ms          %d ms\n", i, a[i].at, a[i].bt);
 	
-//	sorting acc. to increasing arrival time
+	// sorting acc. to increasing arrival time
 	for(i=0;i<n;i++) {
 		for(j=i+1;j<n;j++) {
 			if(a[j].at<a[i].at) {
@@ -55,11 +54,11 @@ void main() {
 		}
 	}
 	
-//	calculations
+	// calculations
 	for(i=0;i<n;i++) {
 		util_time+=a[i].bt;
-		
 		if(c<a[i].at) {
+			idle+=a[i].at-c;
 			if(c) {
 				idle+=a[i].at-c;
 				cswt_idle[d]='i';
@@ -68,7 +67,6 @@ void main() {
 			c=a[i].at;
 			cswt_idle[d]='o';
 		}
-		
 		con_swt[d++]=c;
 		a[i].wt=c-a[i].at;
 		a[i].ta=a[i].wt+a[i].bt;
@@ -90,7 +88,6 @@ void main() {
 			}
 		}
 	}
-	
 	printf("\n Output:");
 	line(42);
 	printf(" Process   Waiting time   Turnaround Time");
@@ -109,11 +106,11 @@ void main() {
 		if(i==0 || cswt_idle[i]=='o')
 			printf(" | OS -> Process");
 		else if(i==d-1 || cswt_idle[i]=='i')
-			printf(" | Process -> OS");
+			printf(" | Process -> OS\n");
 		else
 			printf(" | Process -> OS -> Process");
 	}
-	printf("\n Mode switch points:");
+	printf("\n\n Mode switch points:");
 	for(i=0;i<d;i++) {
 		printf("\n -> %d ms", con_swt[i]);
 		if(i==0 || cswt_idle[i]=='o')
@@ -123,7 +120,6 @@ void main() {
 		else
 			printf(" | User -> Kernel -> User");
 	}
-	
 	getch();
 }
 
@@ -132,6 +128,5 @@ void line(int x) {
 	printf("\n");
 	for(i=0;i<x;i++)
 		printf("-");
-		
 	printf("\n");
 }
