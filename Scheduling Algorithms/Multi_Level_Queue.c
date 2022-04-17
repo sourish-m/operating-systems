@@ -41,7 +41,7 @@ int main() {
 	
 	// input
 	printf("\n Enter Arrival time(AT), Burst time(BT), Priority(PR) and Queue No.(QN) according to the corresponding queue types:");
-	printf("\n 1 - System(OS) Process [RR]\n 2 - Interactive Process [sps]\n 3 - Batch Process [FCFS]\n");
+	printf("\n 1 - System(OS) Process [SPS]\n 2 - Interactive Process [RR]\n 3 - Batch Process [FCFS]\n");
 	for(i=0;i<n;i++) {
 		a[i].p=i;
 		printf("\n Process %d", i);
