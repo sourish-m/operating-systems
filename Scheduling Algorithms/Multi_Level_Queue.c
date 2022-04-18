@@ -77,7 +77,7 @@ int main() {
 	for(i=0;i<n;i++)
 		printf(" P%d            %d ms          %d ms          %d          %d\n", i, a[i].at, a[i].bt, a[i].pr, a[i].qn);
 		
-	printf("\n Time quantum for system process(es): %d\n", quant);
+	printf("\n Time quantum for interactive process(es): %d\n", quant);
 	
 	// calculations
 	for(i=0; i<n; i++) {
