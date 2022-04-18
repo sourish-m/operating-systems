@@ -57,10 +57,9 @@ void main() {
 	// calculations
 	for(i=0;i<n;i++) {
 		util_time+=a[i].bt;
+		idle+=a[i].at-c;
 		if(c<a[i].at) {
-			idle+=a[i].at-c;
 			if(c) {
-				idle+=a[i].at-c;
 				cswt_idle[d]='i';
 				con_swt[d++]=c;
 			}
