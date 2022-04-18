@@ -149,7 +149,7 @@ void sort(int x) {
 			i = j;
 			flag=1;
 		}
-		else if(a[j].pr==min && a[j].rt<a[i].rt) {	// tie-breaker (remaining time)
+		else if(a[j].pr==min && a[j].bt<a[i].bt) {	// tie-breaker (burst time)
 			i = j;
 			flag=1;
 		}

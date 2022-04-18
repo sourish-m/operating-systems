@@ -154,7 +154,7 @@ void sort() {
 	int i, j, t;
 	for(i=f1; i<r1; i++) {
 		for(j=i+1; j<=r1; j++) {
-			if(a[q1[j]].pr<a[q1[i]].pr || a[q1[j]].pr==a[q1[i]].pr && a[q1[j]].rt<a[q1[i]].rt) {
+			if(a[q1[j]].pr<a[q1[i]].pr || a[q1[j]].pr==a[q1[i]].pr && a[q1[j]].bt<a[q1[i]].bt) {
 				t = q1[i];
 				q1[i] = q1[j];
 				q1[j] = t;
