@@ -68,7 +68,7 @@ void main() {
 		if(i==0 || cswt_idle[i]=='o')
 			printf(" | OS -> Process");
 		else if(i==d-1 || cswt_idle[i]=='i')
-			printf(" | Process -> OS\n");
+			printf(" | Process -> OS");
 		else
 			printf(" | Process -> OS -> Process");
 	}

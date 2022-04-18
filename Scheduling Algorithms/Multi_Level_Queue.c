@@ -65,7 +65,7 @@ int main() {
 		a[i].visited=false;
 		printf("\n");
 	}
-	printf(" Enter time quantum for system process(es): ");
+	printf(" Enter time quantum for interactive process(es): ");
 	scanf("%d", &quant);
 	
 	system("cls");
