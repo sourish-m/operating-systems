@@ -3,7 +3,7 @@
 Includes:
 + FCFS scheduling
 + SJF & SRTF scheduling (tie-breaker: Priority for both)
-+ Static Priority (non-preemptive) & Dynamic Priority (preemptive) scheduling (tie-breaker: SJF for both [used remaining time fttb])
++ Static Priority (non-preemptive) & Dynamic Priority (preemptive) scheduling (tie-breaker: SJF for both [burst time])
 + Round-Robin scheduling
 + Multi-Level Queue scheduling (tie-breaker: as per above)
   * OS process queue: Non-preemptive Priority
